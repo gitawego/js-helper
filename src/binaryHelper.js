@@ -1,17 +1,15 @@
     "use strict";
     var binaryHelper = {
         blobToArrayBuffer: function blobToArrayBuffer(blob) {
-            var reader = new FileReader(), deferred = Promise.defer();
-            reader.addEventListener("loadend", function () {
-                // reader.result contains the contents of blob as a typed array
-                deferred.resolve(this.result);
+            return new Promise(function(resolve,reject){
+                var reader = new FileReader();
+                reader.addEventListener("loadend", function () {
+                    // reader.result contains the contents of blob as a typed array
+                    resolve(this.result);
+                });
+                reader.addEventListener("error", reject);
+                reader.readAsArrayBuffer(blob);
             });
-            reader.addEventListener("error", function (err) {
-                // reader.result contains the contents of blob as a typed array
-                deferred.reject(err);
-            });
-            reader.readAsArrayBuffer(blob);
-            return deferred.promise;
         },
         arrayBufferToBinary: function ArrayBufferToString(buffer) {
             var arr = new Uint8Array(buffer);
