@@ -1,8 +1,8 @@
-class BaseAngularController{
-    constructor($scope,$translate){
+class BaseAngularController {
+    constructor($scope, $translate) {
         "use strict";
         this.config = this.config || {
-            exports:[]
+            exports: []
         };
         this.$scope = $scope;
         this.$translate = $translate;
@@ -10,26 +10,29 @@ class BaseAngularController{
         this.attachEvents();
         this.defineScope();
     }
-    attachEvents(){
+
+    attachEvents() {
         "use strict";
-        this.$scope.$on('$destroy',this.destroy.bind(this));
-        this.evts.push(this.$scope.$on('changeLanguage',  () => {
+        this.$scope.$on('$destroy', this.destroy.bind(this));
+        this.evts.push(this.$scope.$on('changeLanguage', () => {
             this.$scope.language = this.$translate.use();
         }));
     }
-    defineScope(){
+
+    defineScope() {
         "use strict";
         this.$scope.language = this.$translate.use();
-        for(let mtd of this.config.exports){
+        for (let mtd of this.config.exports) {
             this.$scope[mtd] = this[mtd].bind(this);
         }
     }
-    destroy(){
+
+    destroy() {
         "use strict";
-        this.evts.forEach(function(e){
+        this.evts.forEach(function (e) {
             e();
         });
     }
 }
-BaseAngularController.$inject = ['$scope','$translate'];
+BaseAngularController.$inject = ['$scope', '$translate'];
 export default BaseAngularController;
