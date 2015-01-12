@@ -2,31 +2,10 @@
 import helper from './helper';
 
 "use strict";
-class SocketIO {
-    constructor(server, io) {
-        this.io = io;
-        if (server) {
-            this.connect(server, io);
-        }
-    }
-
-    connect(server, io) {
-        io = io || this.io;
-        if (!io) {
-            return;
-        }
-        this.io = io;
-        this.socket = io(server);
-        this.socket.on('connect', () => {
-            this.connected = true;
-        });
-        this.socket.on('disconnect', () => {
-            console.log('disconnected');
-            this.connected = false;
-        });
-        this.socket.on('error', (evt)=> {
-            console.log('onerror', evt);
-        });
+class SocketClient {
+    constructor(socket, parent) {
+        this.socket = socket;
+        this.parent = parent;
     }
 
     emit(evtName, msg, callback) {
@@ -75,6 +54,52 @@ class SocketIO {
             this.socket.off(evtName, callback);
         }
     }
+}
+
+class SocketIO {
+    constructor(server, io, config) {
+        this.io = io;
+        this.namespaces = {};
+        if (server) {
+            this.connect(server, config);
+        }
+    }
+
+    /**
+     *
+     * @param server
+     * @param config
+     */
+    connect(server, config) {
+
+        this.manager = this.io.Manager(server, config);
+        var socket = this.nsp('/');
+        ['on', 'emit', 'once', 'socket'].forEach(function (mtd) {
+            this[mtd] = socket[mtd];
+        }, this);
+        //this.socket = this.manager.socket('/');
+        //this.socket = socket.socket;
+
+        this.socket.on('connect', () => {
+            this.connected = true;
+        });
+        this.socket.on('disconnect', () => {
+            console.log('disconnected');
+            this.connected = false;
+        });
+        this.socket.on('error', (evt)=> {
+            console.log('onerror', evt);
+        });
+    }
+
+    nsp(namespace) {
+        var nsp = this.namespaces[namespace];
+        if (nsp) {
+            return nsp;
+        }
+        return this.namespaces[namespace] = new SocketClient(this.manager.socket(namespace), this);
+    }
+
 
 }
 export default SocketIO;
