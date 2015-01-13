@@ -220,6 +220,48 @@ var helper = {
         context = canvas.getContext('2d');
         context.drawImage(src, 0, 0, canvasWidth, height);
         return canvas;
+    },
+    /**
+     * @method getProp
+     * @param {Array} parts
+     * @param {Boolean} create
+     * @param {Object} context
+     * @return Object
+     */
+    getProp: function (parts, create, context) {
+        var obj = context || window;
+        for (var i = 0, p; obj && (p = parts[i]); i++) {
+            obj = (p in obj ? obj[p] : (create ? obj[p] = {} : undefined));
+        }
+        return obj; // mixed
+    },
+    /**
+     * @method getObject
+     * @param {String} name
+     * @param {Boolean} create
+     * @param {Object} context
+     * @return Object
+     */
+    getObject: function (name, create, context) {
+        return helper.getProp(name.split("."), create, context); // Object
+    },
+    substitute: function (template, map, transform, scope) {
+        var run = function (data) {
+            return template.replace(/\$\{([^\s\:\}]+)(?:\:([^\s\:\}]+))?\}/g,
+                function (match, key, format) {
+                    var value = helper.getObject(key, false, data);
+                    if (format) {
+                        value = helper.getObject(format, false, scope).call(scope, value, key);
+                    }
+                    return transform(value, key).toString();
+                });
+        };
+        transform = transform ? transform.bind(scope) : function (v) {
+            return v;
+        };
+        return map ? run(map) : function (map) {
+            return run(map);
+        };
     }
 };
 helper.isNodeWebkit = (function () {
