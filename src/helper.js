@@ -262,6 +262,16 @@ var helper = {
         return map ? run(map) : function (map) {
             return run(map);
         };
+    },
+    findItemByKey:function(key,value,items){
+        var item;
+        items.some(function(itm){
+            if(itm && itm[key] === value){
+                item = itm;
+                return true;
+            }
+        });
+        return item;
     }
 };
 helper.isNodeWebkit = (function () {
