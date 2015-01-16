@@ -272,6 +272,187 @@ var helper = {
             }
         });
         return item;
+    },
+    /**
+     * according to [The structured clone algorithm](https://developer.mozilla.org/en-US/docs/Web/Guide/DOM/The_structured_clone_algorithm)
+     * @method deepClone
+     * @param {Object} oToBeCloned
+     * @returns {Object}
+     */
+    deepClone: function deepClone(oToBeCloned) {
+        if (!oToBeCloned || typeof oToBeCloned !== "object" || typeof(oToBeCloned) === 'function') {
+            // null, undefined, any non-object, or function
+            return oToBeCloned; // anything
+        }
+        var oClone, FConstr = oToBeCloned.constructor;
+
+        if (typeof(HTMLElement) !== 'undefined' && oToBeCloned instanceof HTMLElement) {
+            oClone = oToBeCloned.cloneNode(true);
+        } else if (oToBeCloned instanceof RegExp) {
+            oClone = new RegExp(oToBeCloned.source,
+                "g".substr(0, Number(oToBeCloned.global)) +
+                "i".substr(0, Number(oToBeCloned.ignoreCase)) +
+                "m".substr(0, Number(oToBeCloned.multiline)));
+        } else if (oToBeCloned instanceof Date) {
+            oClone = new Date(oToBeCloned.getTime());
+        } else {
+            oClone = FConstr ? new FConstr() : {};
+            for (var sProp in oToBeCloned) {
+                if (!oToBeCloned.hasOwnProperty(sProp)) {
+                    continue;
+                }
+                oClone[sProp] = deepClone(oToBeCloned[sProp]);
+            }
+        }
+        return oClone;
+    },
+    /**
+     * example:
+     *
+     *      isType('Object')({toto:1});
+     *
+     * @method isType
+     * @param {String} compare Object,String,Array,Function, etc.
+     * @returns {Function}
+     */
+    isType: function isType(compare) {
+        if (typeof compare === 'string' && /^\w+$/.test(compare)) {
+            compare = '[object ' + compare + ']';
+        } else {
+            compare = Object.prototype.toString.call(compare);
+        }
+        return isType[compare] || (isType[compare] = function (o) {
+                return Object.prototype.toString.call(o) === compare;
+            });
+    },
+    /**
+     * guess real type
+     * @method realType
+     * @param str
+     * @returns {*}
+     */
+    realType: function (str) {
+        var xml;
+        if (typeof(str) !== 'string') {
+            return str;
+        }
+        str = str.trim();
+        if (str.trim() === "") {
+            return str;
+        }
+        var mapping = ['true', 'false', 'null', 'undefined'];
+        if (+str === 0 || +str) {
+            return +str;
+        }
+        if (!!~mapping.indexOf(str.toLowerCase())) {
+            return eval(str.toLowerCase());
+        }
+        try {
+            return JSON.parse(str);
+        } catch (e) {
+        }
+        xml = new DOMParser().parseFromString(str, 'text/xml');
+        if (!xml.getElementsByTagName('parsererror').length) {
+            return xml;
+        }
+        return str;
+    },
+    /**
+     * @method castType
+     * @param {*} value
+     * @param {String} type
+     * @returns {*}
+     */
+    castType: function (value, type) {
+        var typeMapping = {
+            "string": function (s) {
+                return s + "";
+            },
+            "number": function (n) {
+                return +n;
+            },
+            "array": function (arr) {
+                if (Array.isArray(arr)) {
+                    return arr;
+                }
+                try {
+                    var tmp = JSON.parse(arr);
+                    if (Array.isArray(tmp)) {
+                        return tmp;
+                    }
+                } catch (e) {
+
+                }
+                return arr.split(',');
+            },
+            "boolean": function (value) {
+                if (!value) {
+                    value = false;
+                } else {
+                    value = ('' + value).toLowerCase();
+                    value = value !== 'false';
+                }
+                return value;
+            },
+            "object": function (o) {
+                try {
+                    return JSON.parse(o);
+                } catch (e) {
+                    return null;
+                }
+            },
+            "xml": function (str) {
+                return new DOMParser().parseFromString(str, 'text/xml');
+            }
+        };
+        if (arguments.length === 0) {
+            return typeMapping;
+        }
+        return typeMapping[type] && typeMapping[type](value);
+    },
+    queryToObject: function (query, separator) {
+        separator = separator || '&';
+        query = query.trim();
+        if (!query) {
+            return;
+        }
+        var params = {};
+        query.split(separator).forEach(function (part) {
+            part = part.trim();
+            if (!part) {
+                return;
+            }
+            var p = part.split('=');
+            params[p[0].trim()] = p[1].trim();
+        });
+        return params;
+    },
+    objectToQuery: function (obj, separator, fromJson) {
+        separator = separator || '&';
+        var query = [];
+        Object.keys(obj).forEach(function (k) {
+            var o = obj[k], tmp;
+            if (typeof(o) === 'object' && fromJson) {
+                try {
+                    tmp = JSON.stringify(o);
+                } catch (e) {
+                    //
+                }
+                if (tmp !== undefined) {
+                    o = encodeURIComponent(tmp);
+                }
+            }
+            query.push(k + '=' + o);
+        });
+        return query.join(separator);
+    },
+    applyIf: function applyIf(dest, obj, override) {
+        var key;
+        for (key in obj) {
+            if (obj.hasOwnProperty(key) && (!(key in dest) || override)) {
+                dest[key] = obj[key];
+            }
+        }
     }
 };
 helper.isNodeWebkit = (function () {
