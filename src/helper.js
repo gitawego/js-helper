@@ -88,7 +88,7 @@ var helper = {
         }
         return run();
     },
-    uuid: (typeof(window.crypto) != 'undefined' &&
+    uuid: (typeof(window) !== 'undefined' && typeof(window.crypto) != 'undefined' &&
     typeof(window.crypto.getRandomValues) != 'undefined') ?
         function () {
             // If we have a cryptographically secure PRNG, use that
