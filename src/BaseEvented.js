@@ -1,5 +1,5 @@
 import CustomEvent from './CustomEvent';
-import {helper} from './helper';
+import helper from './helper';
 let slice = Array.prototype.slice;
 
 /**
