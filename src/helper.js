@@ -453,6 +453,31 @@ var helper = {
                 dest[key] = obj[key];
             }
         }
+    },
+    /**
+     * @method merge
+     * @param {Object} target
+     * @param {Object} source
+     * @param {Boolean} [nonStrict]
+     * @returns {*}
+     */
+    merge: function merge(target, source, nonStrict) {
+        var tval, sval, name;
+        for (name in source) {
+            if (!nonStrict && !source.hasOwnProperty(name)) {
+                continue;
+            }
+            tval = target[name];
+            sval = source[name];
+            if (tval !== sval) {
+                if (tval && typeof tval === 'object' && sval && typeof sval === 'object') {
+                    merge(tval, sval, nonStrict);
+                } else {
+                    target[name] = sval;
+                }
+            }
+        }
+        return target;
     }
 };
 helper.isNodeWebkit = (function () {
