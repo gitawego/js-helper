@@ -16,9 +16,17 @@ class BaseAngularController {
         this.$scope.$on('$destroy', this.destroy.bind(this));
         this.evts.push(this.$scope.$on('changeLanguage', () => {
             this.$scope.language = this.$translate.use();
+            this.$scope.$apply();
         }));
     }
-
+    safeApply(scope, fn) {
+        scope = scope || this.$scope;
+        if((scope.$$phase || scope.$root.$$phase)){
+            fn && fn();
+        }else{
+            scope.$apply(fn);
+        }
+    }
     defineScope() {
         "use strict";
         this.$scope.language = this.$translate.use();
