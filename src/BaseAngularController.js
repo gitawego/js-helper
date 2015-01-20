@@ -8,21 +8,26 @@
 // };
 
 class BaseAngularController {
-    constructor($scope, $translate) {
+    constructor(...args) {
         "use strict";
         this.config = this.config || {
             exports: []
         };
-        this.$scope = $scope;
-        this.$translate = $translate;
+        this.applyToScope(args,BaseAngularController.$inject);
         this.evts = [];
         this.attachEvents();
         this.defineScope();
     }
-
+    applyToScope(args,$inject){
+        args.forEach((ag, i)=> {
+            this[$inject[i]] = ag;
+        });
+    }
     attachEvents() {
         "use strict";
-        this.$scope.$on('$destroy', this.destroy.bind(this));
+        if(this.$scope){
+            this.$scope.$on('$destroy', this.destroy.bind(this));
+        }
         if(this.$translate){
             this.evts.push(this.$scope.$on('changeLanguage', () => {
                 this.$scope.$apply();
