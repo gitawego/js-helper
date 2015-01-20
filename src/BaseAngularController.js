@@ -13,10 +13,12 @@ class BaseAngularController {
         this.config = this.config || {
             exports: []
         };
-        this.applyToScope(args,BaseAngularController.$inject);
+        if(args.length){
+            this.applyToScope(args,BaseAngularController.$inject);
+        }
         this.evts = [];
         this.attachEvents();
-        this.defineScope();
+        this.$scope && this.defineScope();
     }
     applyToScope(args,$inject){
         args.forEach((ag, i)=> {
