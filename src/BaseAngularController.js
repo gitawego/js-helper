@@ -14,10 +14,12 @@ class BaseAngularController {
     attachEvents() {
         "use strict";
         this.$scope.$on('$destroy', this.destroy.bind(this));
-        this.evts.push(this.$scope.$on('changeLanguage', () => {
-            this.$scope.language = this.$translate.use();
-            this.$scope.$apply();
-        }));
+        if(this.$translate){
+            this.evts.push(this.$scope.$on('changeLanguage', () => {
+                this.$scope.$apply();
+            }));    
+        }
+        
     }
     safeApply(scope, fn) {
         scope = scope || this.$scope;
@@ -29,7 +31,6 @@ class BaseAngularController {
     }
     defineScope() {
         "use strict";
-        this.$scope.language = this.$translate.use();
         for (let mtd of this.config.exports) {
             this.$scope[mtd] = this[mtd].bind(this);
         }
