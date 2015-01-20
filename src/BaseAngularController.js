@@ -1,3 +1,12 @@
+// define this method in $rootScope
+// $rootScope.changeLanguage = function (langCode) {
+//     if ($rootScope.language !== langCode) {
+//         $rootScope.language = langCode;
+//     }
+//     $translate.use(langCode);
+//     $rootScope.$broadcast('changeLanguage', langCode);
+// };
+
 class BaseAngularController {
     constructor($scope, $translate) {
         "use strict";
