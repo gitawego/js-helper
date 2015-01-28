@@ -1,5 +1,6 @@
 //var io = require("socket.io-client/socket.io");
 import helper from './helper';
+let LZString = require('lz-string');
 
 "use strict";
 class SocketClient {
@@ -31,6 +32,9 @@ class SocketClient {
                     console.log('socket resp', resp, uuid);
                     rm();
                     delete resp._uuid;
+                    if(resp.data && resp.compressData === "lz-string"){
+                        resp.data = JSON.parse(LZString.decompressFromUTF16(resp.data));
+                    }
                     callback(resp);
                 }
             });
