@@ -32,9 +32,6 @@ class SocketClient {
                     console.log('socket resp', resp, uuid);
                     rm();
                     delete resp._uuid;
-                    if(resp.data && resp.compressData === "lz-string"){
-                        resp.data = JSON.parse(LZString.decompressFromUTF16(resp.data));
-                    }
                     callback(resp);
                 }
             });
