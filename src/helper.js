@@ -150,7 +150,7 @@ var helper = {
                 } else {
                     return result.value(function (err, res) {
                         if (err) {
-                            handler(generator.throw(err));
+                            handle(generator.throw(err));
                         } else {
                             handle(generator.next(res));
                         }
