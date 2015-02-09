@@ -4,7 +4,7 @@ cd ${SCRIPT_PATH}
 
 echo ${SCRIPT_PATH}
 
-pwd
+echo pwd
 
 ls ./node_modules
 
