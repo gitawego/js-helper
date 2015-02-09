@@ -5,15 +5,12 @@
   "main": "helper.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install": "./build.sh"
+    "postinstall": "./build.sh"
   },
   "author": "Hongbo LU",
   "license": "MIT",
   "dependencies": {
-    "lz-string": "^1.3.6"
-    
-  },
-  "devDependencies":{
+    "lz-string": "^1.3.6",
     "6to5":"*"
   }
 }
