@@ -9,8 +9,10 @@
   },
   "author": "Hongbo LU",
   "license": "MIT",
+  "peerDependencies": {
+    "6to5": "*"
+  },
   "dependencies": {
-    "lz-string": "^1.3.6",
-    "6to5":"*"
+    "lz-string": "^1.3.6"
   }
 }
