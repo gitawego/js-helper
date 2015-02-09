@@ -10,7 +10,10 @@
   "author": "Hongbo LU",
   "license": "MIT",
   "dependencies": {
-    "lz-string": "^1.3.6",
+    "lz-string": "^1.3.6"
+    
+  },
+  "devDependencies":{
     "6to5":"*"
   }
 }
