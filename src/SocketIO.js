@@ -10,11 +10,13 @@ class SocketClient {
     }
 
     emit(evtName, msg, callback) {
+        var fullData = '';
         if (callback) {
             var uuid = helper.uuid(), rm;
             msg._uuid = uuid;
             this.once('disconnect', function () {
                 rm && rm();
+                fullData=null;
                 callback({
                     status: 1,
                     error: new Error('disconnected')
@@ -22,6 +24,7 @@ class SocketClient {
             });
             this.once('error', function (evt) {
                 rm && rm();
+                fullData=null;
                 callback({
                     status: 1,
                     error: evt
@@ -29,10 +32,24 @@ class SocketClient {
             });
             rm = this.on(evtName, function (resp) {
                 if (resp._uuid === uuid) {
-                    console.log('socket resp', resp, uuid);
-                    rm();
-                    delete resp._uuid;
-                    callback(resp);
+                    console.log("socket resp", uuid);
+                    if(resp.partial){
+                        fullData += resp.data;
+                        if(resp.partial.total === resp.partial.range.end){
+                            rm();
+                            delete resp._uuid;
+                            delete resp.partial;
+                            resp.data = fullData;
+                            fullData = null;
+                            callback(resp);
+                        }
+
+                    }else{
+                        rm();
+                        delete resp._uuid;
+                        callback(resp);
+                    }
+
                 }
             });
         }
