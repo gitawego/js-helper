@@ -110,6 +110,10 @@ class SocketIO {
         });
     }
 
+    disconnect(){
+        this.manager.disconnect();
+    }
+
     nsp(namespace) {
         var nsp = this.namespaces[namespace];
         if (nsp) {
