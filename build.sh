@@ -6,4 +6,4 @@ echo ${SCRIPT_PATH}
 
 
 
-6to5 src --out-dir dist --modules umd -r
+babel src --out-dir dist --modules umd -r
