@@ -478,6 +478,16 @@ var helper = {
             }
         }
         return target;
+    },
+    leftPad: function leftPad(pad, mystr) {
+        mystr += '';
+        pad += '';
+        return (pad + mystr).slice(-Math.max(pad.length, mystr.length));
+    },
+    rightPad: function rightPad(pad, mystr) {
+        mystr += '';
+        pad += '';
+        return (mystr +pad).slice(0,Math.max(pad.length, mystr.length));
     }
 };
 helper.isNodeWebkit = (function () {
