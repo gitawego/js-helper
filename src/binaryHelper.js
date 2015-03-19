@@ -112,7 +112,7 @@ var binaryHelper = {
         }
 
         return new Blob([uInt8Array], {type: contentType});
-    }
+    },
     b64ImageToBlob: function b64ImageToBlob(b64, callback) {
         var img = new Image();
 
