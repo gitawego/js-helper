@@ -112,26 +112,6 @@ var binaryHelper = {
         }
 
         return new Blob([uInt8Array], {type: contentType});
-    },
-    b64ImageToBlob: function b64ImageToBlob(b64, callback) {
-        var img = new Image();
-
-        img.onerror = callback;
-
-        img.onload = function onload() {
-            var canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            canvas.toBlob(function(blob){
-                callback && callback(null,blob);    
-            });
-        };
-
-        img.src = b64;
     }
 
 };
