@@ -1,6 +1,5 @@
 //var io = require("socket.io-client/socket.io");
 import helper from './helper';
-let LZString = require('lz-string');
 
 "use strict";
 class SocketClient {
