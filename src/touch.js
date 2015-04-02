@@ -3,8 +3,10 @@
  * @class com.sesamtv.core.util.Touch
  * @singleton
  */
-let hasTouch = (window.DocumentTouch && document instanceof DocumentTouch) || navigator.userAgent.match(/(iPhone|iPod|iPad|BlackBerry|Android)/),
-    list = ['touchstart', 'touchmove', 'touchend', 'touchcancel', 'mousedown', 'mousemove', 'mouseup', 'mouseleave'],
+var touch = {};
+if (typeof window !== 'undefined') {
+    let hasTouch = (window.DocumentTouch && document instanceof DocumentTouch) || navigator.userAgent.match(/(iPhone|iPod|iPad|BlackBerry|Android)/),
+        list = ['touchstart', 'touchmove', 'touchend', 'touchcancel', 'mousedown', 'mousemove', 'mouseup', 'mouseleave'];
     touch = hasTouch ? {
         "$evtList": list,
         /**
@@ -38,7 +40,9 @@ let hasTouch = (window.DocumentTouch && document instanceof DocumentTouch) || na
         "touchend": "mouseup",
         "touchcancel": "mouseleave"
     };
-touch.hasTouch = hasTouch;
+    touch.hasTouch = hasTouch;
+}
+
 export default touch;
 
 
