@@ -9,10 +9,8 @@
   },
   "author": "Hongbo LU",
   "license": "MIT",
-  "devDependencies": {
-    "babel": "*"
-  },
   "dependencies": {
-    "lz-string": "^1.3.6"
+    "lz-string": "^1.3.6",
+    "babel": "*"
   }
 }
