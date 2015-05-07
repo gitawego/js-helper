@@ -6,4 +6,4 @@ echo ${SCRIPT_PATH}
 
 
 
-babel src --out-dir dist --modules umd -r
+./node_modules/.bin/babel src --out-dir dist --modules umd -r
