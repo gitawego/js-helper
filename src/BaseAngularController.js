@@ -18,7 +18,9 @@ class BaseAngularController {
         }
         this.evts = [];
         this.attachEvents();
-        this.$scope && this.defineScope();
+        setTimeout(()=>{
+            this.$scope && this.defineScope();
+        });
     }
     applyToScope(args,$inject){
         args.forEach((ag, i)=> {
