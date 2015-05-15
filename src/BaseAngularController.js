@@ -17,10 +17,11 @@ class BaseAngularController {
             this.applyToScope(args,BaseAngularController.$inject);
         }
         this.evts = [];
+        
+    }
+    initCtrl(){
         this.attachEvents();
-        setTimeout(()=>{
-            this.$scope && this.defineScope();
-        });
+        this.defineScope();
     }
     applyToScope(args,$inject){
         args.forEach((ag, i)=> {
