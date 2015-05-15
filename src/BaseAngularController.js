@@ -32,13 +32,7 @@ class BaseAngularController {
         "use strict";
         if(this.$scope){
             this.$scope.$on('$destroy', this.destroy.bind(this));
-        }
-        if(this.$translate){
-            this.evts.push(this.$scope.$on('changeLanguage', () => {
-                this.$scope.$apply();
-            }));    
-        }
-        
+        }        
     }
     safeApply(scope, fn) {
         scope = scope || this.$scope;
