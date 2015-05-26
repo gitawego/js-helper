@@ -204,8 +204,8 @@ var helper = {
             ctx.rotate(degrees * Math.PI / 180);
             ctx.drawImage(img, -img.width / 2, -img.height / 2);
             var dataUri = canvas.toDataURL(), size = {
-                width:img.width,
-                height:img.height
+                width: canvas.width,
+                height: canvas.height
             };
             if (destroy) {
                 canvas = ctx = img = null;
