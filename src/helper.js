@@ -177,6 +177,54 @@ var helper = {
         canvas.getContext("2d").scale(ratio, ratio);
         tmp = null;
     },
+    rotateImage: function(src, cb) {
+        "use strict";
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext("2d");
+        var degrees = 0;
+        var img = new Image();
+
+        function rotate(deg, destroy) {
+            degrees = (degrees + deg) % 360;
+            var absDeg = Math.abs(degrees);
+            if (absDeg == 90 || absDeg == 270) {
+                canvas.width = img.height;
+                canvas.height = img.width;
+            } else {
+                canvas.width = img.width;
+                canvas.height = img.height;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (absDeg == 90 || absDeg == 270) {
+                ctx.translate(img.height / 2, img.width / 2);
+            } else {
+                ctx.translate(img.width / 2, img.height / 2);
+            }
+            ctx.rotate(degrees * Math.PI / 180);
+            ctx.drawImage(img, -img.width / 2, -img.height / 2);
+            var dataUri = canvas.toDataURL(), size = {
+                width:img.width,
+                height:img.height
+            };
+            if (destroy) {
+                canvas = ctx = img = null;
+            }
+            return {
+                src: dataUri,
+                size:size,
+                degrees: degrees
+            };
+        }
+
+        img.onload = function () {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, canvas.width / 2 - img.width / 2, canvas.height / 2 - img.width / 2);
+            cb(rotate);
+        };
+        img.src = src;
+    },
     /**
      *
      * @param {Number} value
