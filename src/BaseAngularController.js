@@ -57,7 +57,9 @@ class BaseAngularController {
   destroy() {
     "use strict";
     this.evts.forEach(function (e) {
-      e();
+      if (typeof(e) === 'function') {
+        e();
+      }
     });
   }
 }
