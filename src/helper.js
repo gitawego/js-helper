@@ -64,7 +64,11 @@ var helper = {
             task(function (err) {
                 "use strict";
                 if (err) {
-
+                    if (typeof err !== 'object') {
+                        err = new Error(err);
+                    }
+                    err.remainTasks = tasks;
+                    err.currentTask = task;
                     return callback && callback(err);
                 }
                 queue(tasks, callback);
