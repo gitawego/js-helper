@@ -58,6 +58,25 @@ var helper = {
             }
         }
     },
+    queue: function queue(tasks, callback) {
+        var task;
+        if (task = tasks.shift()) {
+            task(function (err) {
+                "use strict";
+                if (err) {
+                    if (typeof err !== 'object') {
+                        err = new Error(err);
+                    }
+                    err.remainTasks = tasks;
+                    err.currentTask = task;
+                    return callback && callback(err);
+                }
+                queue(tasks, callback);
+            });
+        } else {
+            callback && callback();
+        }
+    },
     taskBufferAsync: function (tasks, finished, options) {
         options = options || {};
         var total = tasks.length, task;
@@ -165,9 +184,9 @@ var helper = {
         var ratio = window.devicePixelRatio || 1;
         var tmp = document.createElement('canvas');
         size = size || {
-            width: canvas.offsetWidth,
-            height: canvas.offsetHeight
-        };
+                width: canvas.offsetWidth,
+                height: canvas.offsetHeight
+            };
         tmp.width = size.width * ratio;
         tmp.height = size.height * ratio;
         tmp.getContext('2d').drawImage(canvas, 0, 0);
@@ -177,7 +196,12 @@ var helper = {
         canvas.getContext("2d").scale(ratio, ratio);
         tmp = null;
     },
-    rotateImage: function(src, cb) {
+    /**
+     *
+     * @param {String} src datauri or image url
+     * @param {Number} [deg] rotation degree or callback
+     */
+    rotateImage: function (src, deg) {
         "use strict";
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext("2d");
@@ -212,18 +236,21 @@ var helper = {
             }
             return {
                 src: dataUri,
-                size:size,
+                size: size,
                 degrees: degrees
             };
         }
 
-        img.onload = function () {
-            canvas.width = img.width;
-            canvas.height = img.height;
-            ctx.drawImage(img, canvas.width / 2 - img.width / 2, canvas.height / 2 - img.width / 2);
-            cb(rotate);
-        };
-        img.src = src;
+        return new Promise((resolve, reject)=> {
+            img.onload = function () {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, canvas.width / 2 - img.width / 2, canvas.height / 2 - img.width / 2);
+                resolve(typeof(deg) === 'number' ? rotate(deg, true) : rotate);
+            };
+            img.onerror = reject;
+            img.src = src;
+        });
     },
     /**
      *
@@ -311,10 +338,10 @@ var helper = {
             return run(map);
         };
     },
-    findItemByKey:function(key,value,items){
+    findItemByKey: function (key, value, items) {
         var item;
-        items.some(function(itm){
-            if(itm && itm[key] === value){
+        items.some(function (itm) {
+            if (itm && itm[key] === value) {
                 item = itm;
                 return true;
             }
@@ -535,7 +562,7 @@ var helper = {
     rightPad: function rightPad(pad, mystr) {
         mystr += '';
         pad += '';
-        return (mystr +pad).slice(0,Math.max(pad.length, mystr.length));
+        return (mystr + pad).slice(0, Math.max(pad.length, mystr.length));
     }
 };
 helper.isNodeWebkit = (function () {
