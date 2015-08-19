@@ -67,7 +67,6 @@ var helper = {
           if (typeof err !== 'object') {
             err = new Error(err);
           }
-          err.remainTasks = tasks;
           err.currentTask = task;
           return callback && callback(err);
         }
@@ -77,18 +76,31 @@ var helper = {
       callback && callback();
     }
   },
-  stackedQueue: function stackedTaskQueue (tasks, stackNum, callback) {
+  /**
+   *
+   * @param {Array.<function>} tasks
+   * @param {Object} opt
+   * @param {Number} opt.stackNumber
+   * @param {Number} [opt.delay]
+   * @param {Function} callback
+   */
+  stackedQueue: function stackedTaskQueue (tasks, opt, callback) {
     "use strict";
+    opt = opt || {};
     var queue, stackedTasks = [];
-    while ((queue = tasks.splice(0, stackNum)).length) {
+    while ((queue = tasks.splice(0, opt.stackNumber)).length) {
       stackedTasks.push((function (q) {
         return function (cb) {
           helper.taskBufferAsync(q, function () {
             console.log('stackedQueue task', arguments);
-            cb();
+            if (opt.delay) {
+              setTimeout(cb, opt.delay);
+            } else {
+              cb();
+            }
           });
         }
-      })(queue));
+      })(queue.slice(0)));
     }
     this.queue(stackedTasks, callback);
   },
