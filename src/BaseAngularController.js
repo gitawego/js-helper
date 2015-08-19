@@ -50,7 +50,11 @@ class BaseAngularController {
   defineScope() {
     "use strict";
     for (let mtd of this.config.exports) {
-      this.$scope[mtd] = this[mtd].bind(this);
+      if (typeof(this[mtd]) === 'function') {
+        this.$scope[mtd] = this[mtd].bind(this);
+      } else {
+        this.$scope[mtd] = this[mtd];
+      }
     }
   }
 
