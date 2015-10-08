@@ -10,56 +10,51 @@ class SocketClient {
 
   emit(evtName, msg, callback) {
     var fullData;
+    var resolve = function (data) {
+      callback && callback(data);
+      callback = null;
+    };
     if (callback) {
-      var uuid = helper.uuid(), rm;
-      msg._uuid = uuid;
+      //var uuid = helper.uuid(), rm;
+      //msg._uuid = uuid;
       this.once('disconnect', function () {
-        rm && rm();
         fullData = null;
-        callback({
+        resolve({
           status: 1,
           error: new Error('disconnected')
         });
       });
       this.once('error', function (evt) {
-        rm && rm();
         fullData = null;
-        callback({
+        resolve({
           status: 1,
           error: evt
         });
       });
-      rm = this.on(evtName, function (resp) {
-        if (resp._uuid === uuid) {
-          console.log("socket resp", uuid);
-          if (resp.partial) {
-            if (typeof(resp.data) === 'object') {
-              fullData = fullData || [];
-              fullData.push(resp.data);
-            } else {
-              fullData = fullData || '';
-              fullData += resp.data;
-            }
-            if (resp.partial.total === resp.partial.range.end) {
-              rm();
-              delete resp._uuid;
-              delete resp.partial;
-              resp.data = fullData;
-              fullData = null;
-              callback(resp);
-            }
-
-          } else {
-            rm();
-            delete resp._uuid;
-            callback(resp);
-          }
-
-        }
-      });
     }
     console.log('evt', evtName, msg);
-    this.socket.emit(evtName, msg);
+    this.socket.emit(evtName, msg, function (resp) {
+      if (resp.partial) {
+        if (typeof(resp.data) === 'object') {
+          fullData = fullData || [];
+          fullData.push(resp.data);
+        } else {
+          fullData = fullData || '';
+          fullData += resp.data;
+        }
+        if (resp.partial.total === resp.partial.range.end) {
+          delete resp._uuid;
+          delete resp.partial;
+          resp.data = fullData;
+          fullData = null;
+          resolve(resp);
+        }
+
+      } else {
+        delete resp._uuid;
+        resolve(resp);
+      }
+    });
     return this;
   }
 
