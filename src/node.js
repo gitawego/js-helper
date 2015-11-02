@@ -24,5 +24,5 @@ var node = {
 		});
 		return ips;
 	}
-}
+};
 export default node;
