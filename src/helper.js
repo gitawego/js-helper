@@ -37,32 +37,35 @@ var helper = {
       img.src = src;
     });
   },
-  imgResize: function (src, callback, size = {}, mimeType = 'image/jpeg') {
+  imgResize: function (src, size = {}, mimeType = 'image/jpeg') {
     "use strict";
-    var img = document.createElement("img");
-    var canvas = document.createElement("canvas");
-    var ctx = canvas.getContext("2d");
-    img.onload = function () {
-      const {maxWidth:MAX_WIDTH = 400, maxHeight:MAX_HEIGHT=300} = size;
-      let {width,height} = img;
-      if (width > height) {
-        if (width > MAX_WIDTH) {
-          height *= MAX_WIDTH / width;
-          width = MAX_WIDTH;
+    return new Promise((resolve, reject)=> {
+      var img = document.createElement("img");
+      var canvas = document.createElement("canvas");
+      var ctx = canvas.getContext("2d");
+      img.onload = function () {
+        const {maxWidth:MAX_WIDTH = 400, maxHeight:MAX_HEIGHT=300} = size;
+        let {width,height} = img;
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
         }
-      } else {
-        if (height > MAX_HEIGHT) {
-          width *= MAX_HEIGHT / height;
-          height = MAX_HEIGHT;
-        }
-      }
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(img, 0, 0, width, height);
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
 
-      callback && callback(canvas.toDataURL(mimeType));
-    };
-    img.src = src;
+        resolve(canvas.toDataURL(mimeType));
+      };
+      img.onerror = reject;
+      img.src = src;
+    })
   },
   /**
    * @method taskBuffer
