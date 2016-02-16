@@ -23,16 +23,43 @@ if (!Object.assign) {
   });
 }
 var helper = {
+  imgResize: function (src, callback, size = {}, mimeType = 'image/jpeg') {
+    "use strict";
+    var img = document.createElement("img");
+    var canvas = document.createElement("canvas");
+    var ctx = canvas.getContext("2d");
+    img.onload = function () {
+      const {maxWidth:MAX_WIDTH = 400, maxHeight:MAX_HEIGHT=300} = size;
+      let {width,height} = img;
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+      } else {
+        if (height > MAX_HEIGHT) {
+          width *= MAX_HEIGHT / height;
+          height = MAX_HEIGHT;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(img, 0, 0, width, height);
+
+      callback && callback(canvas.toDataURL(mimeType));
+    };
+    img.src = src;
+  },
   /**
    * @method taskBuffer
    * @param {Array.<function(next:function)>} tasks
    * @param {Object} [scope]
    * @returns {{on: Function}}
    */
-  taskBuffer: function taskBuffer (tasks, scope) {
+  taskBuffer: function taskBuffer(tasks, scope) {
     var slice = Array.prototype.slice, args = arguments, task, on = {}, error;
 
-    function next () {
+    function next() {
       if (task = tasks.shift()) {
         task.apply(scope, [next].concat(slice.call(arguments, 0)));
       } else {
@@ -58,7 +85,7 @@ var helper = {
       }
     }
   },
-  queue: function queue (tasks, callback) {
+  queue: function queue(tasks, callback) {
     var task;
     if (task = tasks.shift()) {
       task(function (err) {
@@ -84,7 +111,7 @@ var helper = {
    * @param {Number} [opt.delay]
    * @param {Function} callback
    */
-  stackedQueue: function stackedTaskQueue (tasks, opt, callback) {
+  stackedQueue: function stackedTaskQueue(tasks, opt, callback) {
     "use strict";
     opt = opt || {};
     var queue, stackedTasks = [];
@@ -187,7 +214,7 @@ var helper = {
     return function () {
       var generator = makeGenerator.apply(this, arguments);
       // { done: [Boolean], value: [Object] }
-      function handle (result) {
+      function handle(result) {
         if (result.done) {
           return result.value;
         }
@@ -211,7 +238,7 @@ var helper = {
       return handle(generator.next());
     }
   },
-  resizeCanvas: function resizeCanvas (canvas, size) {
+  resizeCanvas: function resizeCanvas(canvas, size) {
     var ratio = window.devicePixelRatio || 1;
     var tmp = document.createElement('canvas');
     size = size || {
@@ -239,7 +266,7 @@ var helper = {
     var degrees = 0;
     var img = new Image();
 
-    function rotate (deg, destroy) {
+    function rotate(deg, destroy) {
       degrees = (degrees + deg) % 360;
       var absDeg = Math.abs(degrees);
       if (absDeg == 90 || absDeg == 270) {
@@ -292,14 +319,14 @@ var helper = {
    * @param {Number} size.height
    * @returns {number}
    */
-  getRelativeSize: function getRelativeSize (value, unit, size) {
+  getRelativeSize: function getRelativeSize(value, unit, size) {
     if (unit === 'height') {
       return size.height / size.width * value;
     } else {
       return size.width / size.height * value;
     }
   },
-  takeImageFromVideo: function takeImageFromVideo (video, size) {
+  takeImageFromVideo: function takeImageFromVideo(video, size) {
     var canvas = document.createElement('canvas'), dataUri;
     if (!size) {
       size = {
@@ -385,7 +412,7 @@ var helper = {
    * @param {Object} oToBeCloned
    * @returns {Object}
    */
-  deepClone: function deepClone (oToBeCloned) {
+  deepClone: function deepClone(oToBeCloned) {
     if (!oToBeCloned || typeof oToBeCloned !== "object" || typeof(oToBeCloned) === 'function') {
       // null, undefined, any non-object, or function
       return oToBeCloned; // anything
@@ -421,7 +448,7 @@ var helper = {
    * @param {String} compare Object,String,Array,Function, etc.
    * @returns {Function}
    */
-  isType: function isType (compare) {
+  isType: function isType(compare) {
     if (typeof compare === 'string' && /^\w+$/.test(compare)) {
       compare = '[object ' + compare + ']';
     } else {
@@ -552,7 +579,7 @@ var helper = {
     });
     return query.join(separator);
   },
-  applyIf: function applyIf (dest, obj, override) {
+  applyIf: function applyIf(dest, obj, override) {
     var key;
     for (key in obj) {
       if (obj.hasOwnProperty(key) && (!(key in dest) || override)) {
@@ -567,7 +594,7 @@ var helper = {
    * @param {Boolean} [nonStrict]
    * @returns {*}
    */
-  merge: function merge (target, source, nonStrict) {
+  merge: function merge(target, source, nonStrict) {
     var tval, sval, name;
     for (name in source) {
       if (!nonStrict && !source.hasOwnProperty(name)) {
@@ -585,12 +612,12 @@ var helper = {
     }
     return target;
   },
-  leftPad: function leftPad (pad, mystr) {
+  leftPad: function leftPad(pad, mystr) {
     mystr += '';
     pad += '';
     return (pad + mystr).slice(-Math.max(pad.length, mystr.length));
   },
-  rightPad: function rightPad (pad, mystr) {
+  rightPad: function rightPad(pad, mystr) {
     mystr += '';
     pad += '';
     return (mystr + pad).slice(0, Math.max(pad.length, mystr.length));
