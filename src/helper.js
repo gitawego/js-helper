@@ -23,6 +23,20 @@ if (!Object.assign) {
   });
 }
 var helper = {
+  imgSize(src){
+    "use strict";
+    return new Promise((resolve, reject)=> {
+      var img = document.createElement("img");
+      img.onload = function () {
+        resolve({
+          width: img.width,
+          height: img.height
+        });
+      };
+      img.onerror = reject;
+      img.src = src;
+    });
+  },
   imgResize: function (src, callback, size = {}, mimeType = 'image/jpeg') {
     "use strict";
     var img = document.createElement("img");
