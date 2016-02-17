@@ -61,7 +61,13 @@ var helper = {
         canvas.height = height;
         ctx.drawImage(img, 0, 0, width, height);
 
-        resolve(canvas.toDataURL(mimeType));
+        resolve({
+          data: canvas.toDataURL(mimeType),
+          size: {
+            width: width,
+            height: height
+          }
+        });
       };
       img.onerror = reject;
       img.src = src;
