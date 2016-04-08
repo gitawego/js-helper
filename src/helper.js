@@ -1,20 +1,22 @@
 if (!Object.assign) {
-  Object.defineProperty(Object, "assign", {
+  Object.defineProperty(Object, 'assign', {
     enumerable: false,
     configurable: true,
     writable: true,
-    value: function (target, firstSource) {
-      "use strict";
-      if (target === undefined || target === null)
-        throw new TypeError("Cannot convert first argument to object");
-      var to = Object(target);
-      for (var i = 1; i < arguments.length; i++) {
-        var nextSource = arguments[i];
+    value(...args) {
+      'use strict';
+      const [target] = args;
+      if (target === undefined || target === null) {
+        throw new TypeError('Cannot convert first argument to object');
+      }
+      const to = Object(target);
+      for (let i = 1; i < args.length; i++) {
+        const nextSource = args[i];
         if (nextSource === undefined || nextSource === null) continue;
-        var keysArray = Object.keys(Object(nextSource));
-        for (var nextIndex = 0, len = keysArray.length; nextIndex < len; nextIndex++) {
-          var nextKey = keysArray[nextIndex];
-          var desc = Object.getOwnPropertyDescriptor(nextSource, nextKey);
+        const keysArray = Object.keys(Object(nextSource));
+        for (let nextIndex = 0, len = keysArray.length; nextIndex < len; nextIndex++) {
+          const nextKey = keysArray[nextIndex];
+          const desc = Object.getOwnPropertyDescriptor(nextSource, nextKey);
           if (desc !== undefined && desc.enumerable) to[nextKey] = nextSource[nextKey];
         }
       }
@@ -22,11 +24,22 @@ if (!Object.assign) {
     }
   });
 }
-var helper = {
-  imgSize(src){
-    "use strict";
-    return new Promise((resolve, reject)=> {
-      var img = document.createElement("img");
+const helper = {
+  toJSON(str, parser) {
+    return JSON.parse(str, (key, value) => {
+      if (typeof (value) === 'string') {
+        value = isNaN(Date.parse(value)) ? value : new Date(value);
+      }
+      if (parser) {
+        value = parser(value);
+      }
+      return value;
+    });
+  },
+  imgSize(src) {
+    'use strict';
+    return new Promise((resolve, reject) => {
+      const img = document.createElement('img');
       img.onload = function () {
         resolve({
           width: img.width,
@@ -37,15 +50,15 @@ var helper = {
       img.src = src;
     });
   },
-  imgResize: function (src, size = {}, mimeType = 'image/jpeg') {
-    "use strict";
-    return new Promise((resolve, reject)=> {
-      var img = document.createElement("img");
-      var canvas = document.createElement("canvas");
-      var ctx = canvas.getContext("2d");
+  imgResize(src, size = {}, mimeType = 'image/jpeg') {
+    'use strict';
+    return new Promise((resolve, reject) => {
+      const img = document.createElement('img');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
       img.onload = function () {
-        const {maxWidth:MAX_WIDTH = 400, maxHeight:MAX_HEIGHT=300} = size;
-        let {width,height} = img;
+        const { maxWidth: MAX_WIDTH = 400, maxHeight: MAX_HEIGHT = 300 } = size;
+        let { width, height } = img;
         if (width > height) {
           if (width > MAX_WIDTH) {
             height *= MAX_WIDTH / width;
@@ -66,14 +79,14 @@ var helper = {
         resolve({
           data: canvas.toDataURL(mimeType),
           size: {
-            width: width,
-            height: height
+            width,
+            height
           }
         });
       };
       img.onerror = reject;
       img.src = src;
-    })
+    });
   },
   /**
    * @method taskBuffer
@@ -81,12 +94,16 @@ var helper = {
    * @param {Object} [scope]
    * @returns {{on: Function}}
    */
-  taskBuffer: function taskBuffer(tasks, scope) {
-    var slice = Array.prototype.slice, args = arguments, task, on = {}, error;
+  taskBuffer: function taskBuffer(...args) {
+    const [tasks, scope] = args;
+    const slice = Array.prototype.slice;
+    let task;
+    const on = {};
+    let error;
 
-    function next() {
+    function next(...nArgs) {
       if (task = tasks.shift()) {
-        task.apply(scope, [next].concat(slice.call(arguments, 0)));
+        task.apply(scope, [next].concat(slice.call(nArgs, 0)));
       } else {
         on.done && on.done();
       }
@@ -114,7 +131,7 @@ var helper = {
     var task;
     if (task = tasks.shift()) {
       task(function (err) {
-        "use strict";
+        'use strict';
         if (err) {
           if (typeof err !== 'object') {
             err = new Error(err);
@@ -137,7 +154,7 @@ var helper = {
    * @param {Function} callback
    */
   stackedQueue: function stackedTaskQueue(tasks, opt, callback) {
-    "use strict";
+    'use strict';
     opt = opt || {};
     var queue, stackedTasks = [];
     while ((queue = tasks.splice(0, opt.stackNumber)).length) {
@@ -171,7 +188,7 @@ var helper = {
     };
     var run = function () {
       if (!tasks.length) {
-        return console.warn("taskBufferAsync - no task appending");
+        return console.warn('taskBufferAsync - no task appending');
       }
       while (task = tasks.shift()) {
         if ('then' in task) {
@@ -190,8 +207,8 @@ var helper = {
     }
     return run();
   },
-  uuid: (typeof(window) !== 'undefined' && typeof(window.crypto) != 'undefined' &&
-  typeof(window.crypto.getRandomValues) != 'undefined') ?
+  uuid: (typeof (window) !== 'undefined' && typeof (window.crypto) != 'undefined' &&
+    typeof (window.crypto.getRandomValues) != 'undefined') ?
     function () {
       // If we have a cryptographically secure PRNG, use that
       // http://stackoverflow.com/questions/6906916/collisions-when-generating-uuids-in-javascript
@@ -200,22 +217,22 @@ var helper = {
       var S4 = function (num) {
         var ret = num.toString(16);
         while (ret.length < 4) {
-          ret = "0" + ret;
+          ret = '0' + ret;
         }
         return ret;
       };
-      return (S4(buf[0]) + S4(buf[1]) + "-" + S4(buf[2]) + "-" + S4(buf[3]) + "-" + S4(buf[4]) + "-" + S4(buf[5]) + S4(buf[6]) + S4(buf[7]));
+      return (S4(buf[0]) + S4(buf[1]) + '-' + S4(buf[2]) + '-' + S4(buf[3]) + '-' + S4(buf[4]) + '-' + S4(buf[5]) + S4(buf[6]) + S4(buf[7]));
     } : function (tpl) {
-    tpl = tpl || 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
-    var d = (new Date()).getTime();
-    return tpl.replace(/[xy]/g, function (c) {
-      var r = (d + Math.random() * 16) % 16 | 0;
-      d = Math.floor(d / 16);
-      return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
-    });
-  },
+      tpl = tpl || 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+      var d = (new Date()).getTime();
+      return tpl.replace(/[xy]/g, function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c == 'x' ? r : (r & 0x7 | 0x8)).toString(16);
+      });
+    },
   findParentNode: function (target, className, limitNode) {
-    "use strict";
+    'use strict';
     while (target) {
       if (!target.classList) {
         return;
@@ -235,7 +252,7 @@ var helper = {
    * @param {Function} makeGenerator a generator function which returns promise
    * @returns {Function}
    */
-  "async": function (makeGenerator) {
+  'async': function (makeGenerator) {
     return function () {
       var generator = makeGenerator.apply(this, arguments);
       // { done: [Boolean], value: [Object] }
@@ -267,16 +284,16 @@ var helper = {
     var ratio = window.devicePixelRatio || 1;
     var tmp = document.createElement('canvas');
     size = size || {
-        width: canvas.offsetWidth,
-        height: canvas.offsetHeight
-      };
+      width: canvas.offsetWidth,
+      height: canvas.offsetHeight
+    };
     tmp.width = size.width * ratio;
     tmp.height = size.height * ratio;
     tmp.getContext('2d').drawImage(canvas, 0, 0);
     canvas.width = size.width * ratio;
     canvas.height = size.height * ratio;
     canvas.getContext('2d').drawImage(tmp, 0, 0);
-    canvas.getContext("2d").scale(ratio, ratio);
+    canvas.getContext('2d').scale(ratio, ratio);
     tmp = null;
   },
   /**
@@ -285,9 +302,9 @@ var helper = {
    * @param {Number} [deg] rotation degree or callback
    */
   rotateImage: function (src, deg) {
-    "use strict";
+    'use strict';
     var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext("2d");
+    var ctx = canvas.getContext('2d');
     var degrees = 0;
     var img = new Image();
 
@@ -324,12 +341,12 @@ var helper = {
       };
     }
 
-    return new Promise((resolve, reject)=> {
+    return new Promise((resolve, reject) => {
       img.onload = function () {
         canvas.width = img.width;
         canvas.height = img.height;
         ctx.drawImage(img, canvas.width / 2 - img.width / 2, canvas.height / 2 - img.width / 2);
-        resolve(typeof(deg) === 'number' ? rotate(deg, true) : rotate);
+        resolve(typeof (deg) === 'number' ? rotate(deg, true) : rotate);
       };
       img.onerror = reject;
       img.src = src;
@@ -367,7 +384,7 @@ var helper = {
     return dataUri;
   },
   copyCanvas: function (src, canvasWidth) {
-    "use strict";
+    'use strict';
     var height = helper.getRelativeSize(canvasWidth, 'height', {
       width: src.width,
       height: src.height
@@ -401,7 +418,7 @@ var helper = {
    * @return Object
    */
   getObject: function (name, create, context) {
-    return helper.getProp(name.split("."), create, context); // Object
+    return helper.getProp(name.split('.'), create, context); // Object
   },
   substitute: function (template, map, transform, scope) {
     var run = function (data) {
@@ -438,19 +455,19 @@ var helper = {
    * @returns {Object}
    */
   deepClone: function deepClone(oToBeCloned) {
-    if (!oToBeCloned || typeof oToBeCloned !== "object" || typeof(oToBeCloned) === 'function') {
+    if (!oToBeCloned || typeof oToBeCloned !== 'object' || typeof (oToBeCloned) === 'function') {
       // null, undefined, any non-object, or function
       return oToBeCloned; // anything
     }
     var oClone, FConstr = oToBeCloned.constructor;
 
-    if (typeof(HTMLElement) !== 'undefined' && oToBeCloned instanceof HTMLElement) {
+    if (typeof (HTMLElement) !== 'undefined' && oToBeCloned instanceof HTMLElement) {
       oClone = oToBeCloned.cloneNode(true);
     } else if (oToBeCloned instanceof RegExp) {
       oClone = new RegExp(oToBeCloned.source,
-        "g".substr(0, Number(oToBeCloned.global)) +
-        "i".substr(0, Number(oToBeCloned.ignoreCase)) +
-        "m".substr(0, Number(oToBeCloned.multiline)));
+        'g'.substr(0, Number(oToBeCloned.global)) +
+        'i'.substr(0, Number(oToBeCloned.ignoreCase)) +
+        'm'.substr(0, Number(oToBeCloned.multiline)));
     } else if (oToBeCloned instanceof Date) {
       oClone = new Date(oToBeCloned.getTime());
     } else {
@@ -480,8 +497,8 @@ var helper = {
       compare = Object.prototype.toString.call(compare);
     }
     return isType[compare] || (isType[compare] = function (o) {
-        return Object.prototype.toString.call(o) === compare;
-      });
+      return Object.prototype.toString.call(o) === compare;
+    });
   },
   /**
    * guess real type
@@ -491,11 +508,11 @@ var helper = {
    */
   realType: function (str) {
     var xml;
-    if (typeof(str) !== 'string') {
+    if (typeof (str) !== 'string') {
       return str;
     }
     str = str.trim();
-    if (str.trim() === "") {
+    if (str.trim() === '') {
       return str;
     }
     var mapping = ['true', 'false', 'null', 'undefined'];
@@ -523,13 +540,13 @@ var helper = {
    */
   castType: function (value, type) {
     var typeMapping = {
-      "string": function (s) {
-        return s + "";
+      'string': function (s) {
+        return s + '';
       },
-      "number": function (n) {
+      'number': function (n) {
         return +n;
       },
-      "array": function (arr) {
+      'array': function (arr) {
         if (Array.isArray(arr)) {
           return arr;
         }
@@ -543,7 +560,7 @@ var helper = {
         }
         return arr.split(',');
       },
-      "boolean": function (value) {
+      'boolean': function (value) {
         if (!value) {
           value = false;
         } else {
@@ -552,14 +569,14 @@ var helper = {
         }
         return value;
       },
-      "object": function (o) {
+      'object': function (o) {
         try {
           return JSON.parse(o);
         } catch (e) {
           return null;
         }
       },
-      "xml": function (str) {
+      'xml': function (str) {
         return new DOMParser().parseFromString(str, 'text/xml');
       }
     };
@@ -590,7 +607,7 @@ var helper = {
     var query = [];
     Object.keys(obj).forEach(function (k) {
       var o = obj[k], tmp;
-      if (typeof(o) === 'object' && fromJson) {
+      if (typeof (o) === 'object' && fromJson) {
         try {
           tmp = JSON.stringify(o);
         } catch (e) {
@@ -649,7 +666,7 @@ var helper = {
   }
 };
 helper.isNodeWebkit = (function () {
-  "use strict";
-  return !!(typeof(process) === 'object' && process && process.__node_webkit);
+  'use strict';
+  return !!(typeof (process) === 'object' && process && process.__node_webkit);
 })();
 export default helper;
