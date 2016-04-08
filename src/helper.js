@@ -102,10 +102,11 @@ const helper = {
     let error;
 
     function next(...nArgs) {
-      if (task = tasks.shift()) {
+      task = tasks.shift();
+      if (task) {
         task.apply(scope, [next].concat(slice.call(nArgs, 0)));
-      } else {
-        on.done && on.done();
+      } else if (on.done) {
+        on.done();
       }
     }
 
