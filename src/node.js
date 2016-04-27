@@ -26,7 +26,6 @@ var node = {
     return ips;
   },
   streamize(str){
-    "use strict";
     var s = new Readable;
     s.push(str);    // the string you want
     s.push(null);      // indicates end-of-file basically - the end of the stream

@@ -1,4 +1,3 @@
-"use strict";
 /**
  * @class com.sesamtv.core.util.Touch
  * @singleton

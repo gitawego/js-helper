@@ -9,7 +9,6 @@
 
 class BaseAngularController {
   constructor(...args) {
-    "use strict";
     this.config = this.config || {
         exports: []
       };
@@ -32,7 +31,6 @@ class BaseAngularController {
   }
 
   attachEvents() {
-    "use strict";
     if (this.$scope) {
       this.$scope.$on('$destroy', this.destroy.bind(this));
     }
@@ -48,7 +46,6 @@ class BaseAngularController {
   }
 
   defineScope() {
-    "use strict";
     for (let mtd of this.config.exports) {
       if (typeof(this[mtd]) === 'function') {
         this.$scope[mtd] = this[mtd].bind(this);
@@ -59,7 +56,6 @@ class BaseAngularController {
   }
 
   destroy() {
-    "use strict";
     this.evts.forEach(function (e) {
       if (typeof(e) === 'function') {
         e();

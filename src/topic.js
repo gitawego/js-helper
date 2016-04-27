@@ -1,6 +1,5 @@
 import CustomEvent from './CustomEvent';
 
-'use strict';
 var evt = new CustomEvent();
 /**
  * topic system (publish/subscribe)

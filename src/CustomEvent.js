@@ -1,4 +1,3 @@
-"use strict";
 let slice = Array.prototype.slice,
     glb = typeof(window) !== 'undefined' ? window : global;
 

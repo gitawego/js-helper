@@ -4,7 +4,6 @@ if (!Object.assign) {
     configurable: true,
     writable: true,
     value(...args) {
-      'use strict';
       const [target] = args;
       if (target === undefined || target === null) {
         throw new TypeError('Cannot convert first argument to object');
@@ -38,7 +37,6 @@ const helper = {
     });
   },
   imgSize(src) {
-    'use strict';
     return new Promise((resolve, reject) => {
       const img = document.createElement('img');
       img.onload = function () {
@@ -52,7 +50,6 @@ const helper = {
     });
   },
   imgResize(src, size = {}, mimeType = 'image/jpeg') {
-    'use strict';
     return new Promise((resolve, reject) => {
       const img = document.createElement('img');
       const canvas = document.createElement('canvas');
@@ -133,7 +130,6 @@ const helper = {
     var task;
     if (task = tasks.shift()) {
       task(function (err) {
-        'use strict';
         if (err) {
           if (typeof err !== 'object') {
             err = new Error(err);
@@ -156,7 +152,6 @@ const helper = {
    * @param {Function} callback
    */
   stackedQueue: function stackedTaskQueue(tasks, opt, callback) {
-    'use strict';
     opt = opt || {};
     var queue, stackedTasks = [];
     while ((queue = tasks.splice(0, opt.stackNumber)).length) {
@@ -234,7 +229,6 @@ const helper = {
       });
     },
   findParentNode: function (target, className, limitNode) {
-    'use strict';
     while (target) {
       if (!target.classList) {
         return;
@@ -304,7 +298,6 @@ const helper = {
    * @param {Number} [deg] rotation degree or callback
    */
   rotateImage: function (src, deg) {
-    'use strict';
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext('2d');
     var degrees = 0;
@@ -386,7 +379,6 @@ const helper = {
     return dataUri;
   },
   copyCanvas: function (src, canvasWidth) {
-    'use strict';
     var height = helper.getRelativeSize(canvasWidth, 'height', {
       width: src.width,
       height: src.height
@@ -668,7 +660,6 @@ const helper = {
   }
 };
 helper.isNodeWebkit = (function () {
-  'use strict';
   return !!(typeof (process) === 'object' && process && process.__node_webkit);
 })();
 export default helper;

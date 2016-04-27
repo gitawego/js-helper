@@ -14,7 +14,6 @@ execSync('rm -rf dist/!*', {
 var babel = require('babel');
 
 fs.readdirSync(srcPath).forEach(function (filename) {
-    "use strict";
     if (path.extname(filename) === '.js') {
         var filePath = path.join(srcPath, filename);
         var destFilePath = path.join(distPath, filename);

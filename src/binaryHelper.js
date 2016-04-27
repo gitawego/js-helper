@@ -1,4 +1,3 @@
-"use strict";
 var binaryHelper = {
     blobToArrayBuffer: function blobToArrayBuffer(blob) {
         return new Promise(function (resolve, reject) {

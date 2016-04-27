@@ -1,7 +1,6 @@
 //var io = require("socket.io-client/socket.io");
 import helper from './helper';
 
-"use strict";
 class SocketClient {
   constructor(socket, parent) {
     this.socket = socket;

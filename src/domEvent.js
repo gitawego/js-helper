@@ -1,5 +1,4 @@
 import touch from './touch';
-"use strict";
 var slice = Array.prototype.slice,
     whichTransitionEvent = function whichTransitionEvent() {
         if (whichTransitionEvent.cache) {
